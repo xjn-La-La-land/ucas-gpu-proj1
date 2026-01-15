@@ -26,10 +26,10 @@
 ### 推理加速优化
 1. Conv2D + IFNode 融合为一个 Kernel， Linear + IFNode 融合为一个 Kernel，减少全局内存访问次数，以及内核启动开销。
 2. 全连接层的 GEMM 实现采用了共享内存分块 + 寄存器分块，减少内存访问的延迟。
-- 共享内存分块大小为 32x32x64（TILE_M, TILE_N, TILE_K），每个 thread block 计算 32x32 的输出子矩阵。
-- 寄存器分块大小为 4x2，每个线程计算 4x2 个输出元素。
+   - 共享内存分块大小为 32x32x64（TILE_M, TILE_N, TILE_K），每个 thread block 计算 32x32 的输出子矩阵。
+   - 寄存器分块大小为 4x2，每个线程计算 4x2 个输出元素。
 3. 卷积层的 CONV2D 实现采用了共享内存分块，优化内存访问。
-- 在 HxWxCout 三个维度上进行分块，每个 thread block 计算一个 TILE_H x TILE_W x OUT_PER_BLOCK (14x14x4) 的输出子矩阵。共享内存中存放 16x16 的输入子矩阵和 3x3x4 的权重子矩阵。
+   - 在 HxWxCout 三个维度上进行分块，每个 thread block 计算一个 TILE_H x TILE_W x OUT_PER_BLOCK (14x14x4) 的输出子矩阵。共享内存中存放 16x16 的输入子矩阵和 3x3x4 的权重子矩阵。
 4. PTX 优化：
-- 向量化内存操作：通过 v4.f32 向量指令一次性读写 4 个 float 数据，降低内存带宽消耗。
-- FMA 融合指令：使用 fma.rn.f32 替代分离的乘法和加法，减少指令数和延迟。
+   - 向量化内存操作：通过 v4.f32 向量指令一次性读写 4 个 float 数据，降低内存带宽消耗。
+   - FMA 融合指令：使用 fma.rn.f32 替代分离的乘法和加法，减少指令数和延迟。
