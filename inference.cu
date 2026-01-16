@@ -227,9 +227,9 @@ scnn_inference(const std::vector<std::vector<float>> &images,
         // pack B images into a contiguous host buffer then memcpy
         std::vector<float> h_batch_in(B * Cin1 * H1 * W1);
         for (int b = 0; b < B; ++b) {
-        const auto &img = images[i + b];
-        memcpy(h_batch_in.data() + b * Cin1 * H1 * W1, img.data(),
-                Cin1 * H1 * W1 * sizeof(float));
+            const auto &img = images[i + b];
+            memcpy(h_batch_in.data() + b * Cin1 * H1 * W1, img.data(),
+                    Cin1 * H1 * W1 * sizeof(float));
         }
         checkCudaErrors(cudaMemcpy(d_input, h_batch_in.data(),
                                 h_batch_in.size() * sizeof(float),
